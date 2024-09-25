@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import { Hono } from "hono";
 import { sign } from "hono/jwt";
+import { signupSchema, signinSchema } from "@zicor/medium-common";
 
 const EXPIRE_TIME = Math.floor(Date.now() / 1000) + 60 * 60 * 2;
 
@@ -28,6 +29,13 @@ userRouter.post('/signup', async (c) => {
     const prisma = c.get("prisma")
   
     const body = await c.req.json();
+    
+    const { success } = signupSchema.safeParse(body);
+    if(!success){
+        return c.json({
+        error: "Invalid Input"
+        })
+    }
   
     try {
       const newUser = await prisma.user.create({
@@ -51,6 +59,12 @@ userRouter.post('/signup', async (c) => {
 userRouter.post('/signin', async (c) => {
     const prisma = c.get("prisma")
     const body = await c.req.json();
+    const {success} = signinSchema.safeParse(body);
+    if(!success){
+        return c.json({
+        error: "Invalid Input"
+        })
+    }
     const user = await prisma.user.findUnique({
             where: {
                 email: body.email

@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import { Hono } from "hono";
 import { verify } from "hono/jwt";
+import { createPostSchema, updatePostSchema } from "@zicor/medium-common";
 
 const EXPIRE_TIME = Math.floor(Date.now() / 1000) + 60 * 60 * 2;
 
@@ -42,6 +43,12 @@ blogRouter.use('*', async (c, next) => {
 //   authorId  String
 blogRouter.post('/', async (c) => {
     const body = await c.req.json();
+    const { success } = createPostSchema.safeParse(body);
+    if(!success){
+        return c.json({
+            error: "Invalid Input"
+        })
+    }
     const userId = c.get("userId");
     const prisma = c.get("prisma");
     try {
@@ -65,6 +72,7 @@ blogRouter.post('/', async (c) => {
 //Update Blog
 blogRouter.put('/', async (c) => {
     const body = await c.req.json();
+    const { success } = updatePostSchema.safeParse(body);
     const prisma = c.get("prisma");
     const blog = await prisma.blog.update({
         where: {
