@@ -3,6 +3,11 @@ import { withAccelerate } from "@prisma/extension-accelerate";
 import { Hono } from "hono";
 import { sign } from "hono/jwt";
 import { signupSchema, signinSchema } from "@zicor/medium-common";
+import {
+  getCookie,
+  setCookie,
+  deleteCookie,
+} from 'hono/cookie'
 
 const EXPIRE_TIME = Math.floor(Date.now() / 1000) + 60 * 60 * 2;
 
@@ -26,11 +31,14 @@ userRouter.use('*', async (c, next)=> {
 })
 
 userRouter.post('/signup', async (c) => {
+
     const prisma = c.get("prisma")
   
     const body = await c.req.json();
     
-    const { success } = signupSchema.safeParse(body);
+    const { success, data, error } = signupSchema.safeParse(body);
+    console.log(success, data, error);
+    
     if(!success){
         return c.json({
         error: "Invalid Input"
@@ -46,6 +54,7 @@ userRouter.post('/signup', async (c) => {
       })
       ///Math.floor(Date.now() / 1000) + 60 * 60 * 2 expires in 2hrs 
       const token = await sign({ id : newUser.id, exp: EXPIRE_TIME} , c.env.JWT_SECRET ) 
+      setCookie(c, 'jwt', token)
       return c.json({ jwt :token})
   
     } catch (e) {
@@ -56,7 +65,7 @@ userRouter.post('/signup', async (c) => {
     }  
   })
   
-userRouter.post('/signin', async (c) => {
+userRouter.post('/login', async (c) => {
     const prisma = c.get("prisma")
     const body = await c.req.json();
     const {success} = signinSchema.safeParse(body);
@@ -76,5 +85,6 @@ userRouter.post('/signin', async (c) => {
         })
     }
     const jwt = await sign({id: user.id, exp: EXPIRE_TIME}, c.env.JWT_SECRET);
+    setCookie(c, 'jwt', jwt)
     return c.json({jwt})
 })
