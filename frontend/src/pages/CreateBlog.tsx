@@ -4,7 +4,7 @@ import Navbar from "../components/Navbar";
 import { Placeholder } from "novel/extensions";
 
 export default function CreateBlog() {
-  const [data, setData] = useState("");
+  const [data, setData] = useState("Tell your story here...");
   const [title, setTitle] = useState("");
 
   console.log(data);
@@ -24,8 +24,8 @@ export default function CreateBlog() {
     <>
             <Navbar />
             <div className=" px-[5%] md:px-[20%] mt-10 bg-custom-white">
-            <input
-              type="text"
+            <textarea
+              
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Title"

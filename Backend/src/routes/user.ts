@@ -4,9 +4,7 @@ import { Hono } from "hono";
 import { sign } from "hono/jwt";
 import { signupSchema, signinSchema } from "@zicor/medium-common";
 import {
-  getCookie,
   setCookie,
-  deleteCookie,
 } from 'hono/cookie'
 
 const EXPIRE_TIME = Math.floor(Date.now() / 1000) + 60 * 60 * 2;
@@ -49,7 +47,8 @@ userRouter.post('/signup', async (c) => {
       const newUser = await prisma.user.create({
         data: {
           email : body.email,
-          name : body.name
+          name : body.name,
+          password : body.password
         }
       })
       ///Math.floor(Date.now() / 1000) + 60 * 60 * 2 expires in 2hrs 
@@ -76,7 +75,8 @@ userRouter.post('/login', async (c) => {
     }
     const user = await prisma.user.findUnique({
             where: {
-                email: body.email
+                email: body.email,
+                password: body.password
             }
         });
     if(!user){

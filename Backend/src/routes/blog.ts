@@ -3,6 +3,7 @@ import { withAccelerate } from "@prisma/extension-accelerate";
 import { Hono } from "hono";
 import { verify } from "hono/jwt";
 import { createPostSchema, updatePostSchema } from "@zicor/medium-common";
+import { auth } from "hono/utils/basic-auth";
 
 const EXPIRE_TIME = Math.floor(Date.now() / 1000) + 60 * 60 * 2;
 
@@ -91,9 +92,22 @@ blogRouter.put('/', async (c) => {
 })
 
 blogRouter.get('/bulk', async (c) => {
-    const body = await c.req.json();
+    // const body = await c.req.json();
     const prisma = c.get("prisma");
-    const blogs = await prisma.blog.findMany()
+    const blogs = await prisma.blog.findMany({
+        select: {
+            id: true,
+            title: true,
+            content: true,
+            authorId: true,
+            published: true,
+            author: {
+                    select: {
+                        name: true
+                    }               
+            }
+        }
+    })
 
     return c.json({
         blogs
@@ -106,7 +120,19 @@ blogRouter.get('/:id', async (c) => {
     const blog = await prisma.blog.findFirst({
         where: {
             id: id
-        }        
+        },
+        select: {
+            id: true,
+            title: true,
+            content: true,
+            authorId: true,
+            published: true,
+            author: {
+                    select: {
+                        name: true
+                    }               
+            }
+        }      
     })
 
     return c.json({
