@@ -36,7 +36,6 @@ function Blogs()  {
                      published={blog.published} 
                      authorId={blog.authorId}
                      image={blog.image}
-                     id={blog.id}
                   />
                   </Link>
                   </>   

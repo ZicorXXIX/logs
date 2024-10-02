@@ -1,5 +1,4 @@
 import Avatar from "../ui/Avatar"
-import { useState } from "react";
 
 // import { formatDate } from "../utils/FormatDate";
 interface BlogCardProps {
