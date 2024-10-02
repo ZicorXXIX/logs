@@ -4,7 +4,7 @@ import { Button } from "../ui/Button";
 import { ChangeEvent, useState } from "react";
 import { SignupSchema, SigninSchema } from "@zicor/medium-common";
 import axios from "axios";
-import { BACKEND_URL } from "../config";
+import { BACKEND_URL } from "../config.ts";
 
 export default function Auth({type}: {type: "login" | "signup"}) {
     const navigate = useNavigate();
@@ -30,7 +30,7 @@ export default function Auth({type}: {type: "login" | "signup"}) {
             navigate("/blogs");
             console.log(response.status);
 
-        } catch (error) {
+        } catch (error : any) {
             console.log(error.response.data);
             setLoading(false)
             setError(error.response.data.error[0].message);

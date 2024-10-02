@@ -2,9 +2,8 @@ import Avatar from "../ui/Avatar"
 import { useState } from "react";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { initializeApp } from "firebase/app";
-import { firebaseConfig } from "../config";
 import axios from "axios";
-import { BACKEND_URL } from "../config";
+import { BACKEND_URL, firebaseConfig } from "../config.ts";
 import Navbar from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
 // import { formatDate } from "../utils/FormatDate";
