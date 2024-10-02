@@ -19,9 +19,10 @@ export default function BlogContent() {
                 <p className="text-sm text-black/70 font-normal">4 min read · {blog?.published}</p>
             </div>
         </div>
-        <hr className="h-px my-8 bg-gray-300 border-0"></hr>           
-        <div className="text-xl font-serif mt-6">
-            {blog?.content}                    
+        <hr className="h-px my-8 bg-gray-300 border-0"></hr>   
+                
+        <div className="prose text-lg font-serif mt-6" dangerouslySetInnerHTML={{__html: blog?.content || ""}}>
+            {/* {blog?.content}                     */}
         </div>
     </>
 }

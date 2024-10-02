@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar";
 import Tabs from "../components/Tabs";
 import {useState} from 'react';
 import {useBlogs} from '../hooks/index';
+import { Link } from "react-router-dom";
 
 export default  function Blogs()  {
    const {loading, blogs} = useBlogs();
@@ -16,16 +17,17 @@ export default  function Blogs()  {
                {!loading && blogs.length === 0 && <p className="text-center">No blogs available</p>}
                {loading && 
                (<>
-               <Skeleton />
-               <Skeleton />
-               <Skeleton />
-               <Skeleton />
+               <Skeleton key={1}/>
+               <Skeleton key={2}/>
+               <Skeleton key={3} />
+               <Skeleton key={4} />
                </>
                )}
                {blogs.map((blog) => (
                   <>
+                  <Link to={`/blogs/${blog.id}`}>
                   <BlogCard 
-                     key={blog.title} 
+                     key={blog.id} 
                      title={blog.title} 
                      content={blog.content} 
                      author={blog.author} 
@@ -33,6 +35,7 @@ export default  function Blogs()  {
                      authorId={blog.authorId}
                      id={blog.id}
                   />
+                  </Link>
                   </>   
                ))}
             </div>         

@@ -3,7 +3,6 @@ import { withAccelerate } from "@prisma/extension-accelerate";
 import { Hono } from "hono";
 import { verify } from "hono/jwt";
 import { createPostSchema, updatePostSchema } from "@zicor/medium-common";
-import { auth } from "hono/utils/basic-auth";
 
 const EXPIRE_TIME = Math.floor(Date.now() / 1000) + 60 * 60 * 2;
 
@@ -32,6 +31,7 @@ blogRouter.use('*', async (c, next) => {
         c.set("userId", decoded.id)
         await next()
     } catch (error) {
+        console.log(error)
         return c.json({error: "Unauthorized access"})   
     }
 })

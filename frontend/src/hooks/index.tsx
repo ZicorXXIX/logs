@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react"
 import { BACKEND_URL } from "../config";
 import axios from "axios";
+import jwt from 'jsonwebtoken';
+
 
 interface Blog {
     title: string;
@@ -59,5 +61,23 @@ export const useBlogs = () => {
     return {
         loading,
         blogs
+    }
+}
+
+export const useAuth = () =>{
+    const [user, setUser] = useState("");
+    useEffect(()=>{
+        axios.get( `${BACKEND_URL}/api/v1/user/isAuth`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('jwt')}`
+            }
+        })
+        .then( (res) => {
+            console.log(res.data)
+            setUser(res.data.decoded.name || "Anonymous")
+        })
+    })
+    return {
+        user
     }
 }

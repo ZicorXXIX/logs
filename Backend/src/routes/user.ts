@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import { Hono } from "hono";
-import { sign } from "hono/jwt";
+import { sign, verify} from "hono/jwt";
 import { signupSchema, signinSchema } from "@zicor/medium-common";
 import {
   setCookie,
@@ -28,6 +28,19 @@ userRouter.use('*', async (c, next)=> {
     await next();
 })
 
+userRouter.get('/isAuth', async (c) =>{
+  try {
+    const header = c.req.header('Authorization') as string;
+    const token = header.split(" ")[1];
+    const decoded = await verify(token, c.env.JWT_SECRET)
+    console.log(decoded)
+    return c.json({decoded})
+  } catch (error) {
+      c.status(403)
+      return c.json({error: "Unauthorized access"})   
+  }
+})
+
 userRouter.post('/signup', async (c) => {
 
     const prisma = c.get("prisma")
@@ -38,9 +51,10 @@ userRouter.post('/signup', async (c) => {
     console.log(success, data, error);
     
     if(!success){
-        return c.json({
-        error: "Invalid Input"
-        })
+      c.status(403)
+      return c.json({
+        error: error.issues
+      })
     }
   
     try {
@@ -52,14 +66,14 @@ userRouter.post('/signup', async (c) => {
         }
       })
       ///Math.floor(Date.now() / 1000) + 60 * 60 * 2 expires in 2hrs 
-      const token = await sign({ id : newUser.id, exp: EXPIRE_TIME} , c.env.JWT_SECRET ) 
+      const token = await sign({ id : newUser.id, name: newUser.name,  exp: EXPIRE_TIME} , c.env.JWT_SECRET ) 
       setCookie(c, 'jwt', token)
       return c.json({ jwt :token})
   
     } catch (e) {
       c.status(403);
       return c.json({
-        error: "Error Creating User....."
+        error: [{message: "Error Creating User....."}]
       }) 
     }  
   })
@@ -67,10 +81,11 @@ userRouter.post('/signup', async (c) => {
 userRouter.post('/login', async (c) => {
     const prisma = c.get("prisma")
     const body = await c.req.json();
-    const {success} = signinSchema.safeParse(body);
+    const {success, error} = signinSchema.safeParse(body);
     if(!success){
+        c.status(403)
         return c.json({
-        error: "Invalid Input"
+          error: error.issues
         })
     }
     const user = await prisma.user.findUnique({
@@ -80,11 +95,34 @@ userRouter.post('/login', async (c) => {
             }
         });
     if(!user){
+        c.status(403)
         return c.json({
-        error: "USER NOT FOUND"
+        error:[ {message: "User not found or incorrect password"}]
         })
     }
-    const jwt = await sign({id: user.id, exp: EXPIRE_TIME}, c.env.JWT_SECRET);
+    const jwt = await sign({id: user.id, name: user.name, exp: EXPIRE_TIME}, c.env.JWT_SECRET);
     setCookie(c, 'jwt', jwt)
     return c.json({jwt})
+})
+
+
+userRouter.get('/:id', async (c) => {
+  const id = c.req.param('id')
+  const prisma = c.get('prisma')
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        id
+      }
+    })
+    return c.json({
+      user
+    })
+  } catch (error) {
+    console.log(error) 
+    c.status(403)  
+    return c.json({
+      error: "Error fetching User"
+    }) 
+  }
 })
