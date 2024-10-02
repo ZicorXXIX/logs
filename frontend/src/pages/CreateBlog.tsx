@@ -6,7 +6,7 @@ import { firebaseConfig } from "../config.ts";
 import { useNavigate } from "react-router-dom";
 import { initializeApp } from "firebase/app";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import ImageExtension from '../components/ImageExtension';
+import ImageExtension from '../components/ImageExtension.tsx';
 
 
 export default function CreateBlog() {

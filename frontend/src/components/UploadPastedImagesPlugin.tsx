@@ -15,6 +15,7 @@ const UploadPastedImagesPlugin = (upload: UploadFn) =>
         // Adjust decoration positions to changes made by the transaction
         set = set.map(tr.mapping, tr.doc);
         // See if the transaction adds or removes any placeholders
+        //@ts-ignore
         const action = tr.getMeta(this);
         if (action && action.add) {
           // Lower image opacity to indicate uploading process
@@ -27,6 +28,7 @@ const UploadPastedImagesPlugin = (upload: UploadFn) =>
           set = set.add(tr.doc, [deco]);
         } else if (action && action.remove) {
           set = set.remove(
+            //@ts-ignore
             set.find(null, null, (spec) => spec.id == action.remove.id)
           );
         }
@@ -44,7 +46,7 @@ const UploadPastedImagesPlugin = (upload: UploadFn) =>
       },
     },
   });
-
+//@ts-ignore
 const pasteHandler = (view, event, upload) => {
   // Get the data of clipboard
   const clipboardItems = event?.clipboardData?.items;
@@ -70,13 +72,14 @@ const pasteHandler = (view, event, upload) => {
   event.preventDefault();
   return true;
 };
-
+//@ts-ignore
 function findPlaceholder(state, id) {
   const decos = uploadKey.getState(state);
+  //@ts-ignore
   const found = decos.find(null, null, (spec) => spec.id == id);
   return found.length ? found[0].from : null;
 }
-
+//@ts-ignore
 function startImageUpload(view, file, upload) {
   // A fresh object to act as the ID for this upload
   const id = {};
@@ -97,7 +100,7 @@ function startImageUpload(view, file, upload) {
     });
     view.dispatch(tr);
   };
-
+//@ts-ignore
   upload(file).then((src) => {
     const pos = findPlaceholder(view.state, id);
     // If the content around the placeholder has been deleted, drop
