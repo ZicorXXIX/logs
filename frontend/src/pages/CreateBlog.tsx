@@ -6,6 +6,7 @@ import { firebaseConfig } from "../config.ts";
 import { useNavigate } from "react-router-dom";
 import { initializeApp } from "firebase/app";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import ImageExtension from '../components/ImageExtension';
 
 
 export default function CreateBlog() {
@@ -15,7 +16,29 @@ export default function CreateBlog() {
 
   const storage = getStorage(initializeApp(firebaseConfig));
 
-  const extensions = [Placeholder.configure({
+  const savePastedImage = async (file: File) => {
+    try {
+      // Generate a unique filename to prevent overwrites
+      console.log('image si uplaoading');
+      console.log(file);
+      const filename = `${Date.now()}-${file.name}`;
+      const imageRef = ref(storage, `images/${filename}`);
+
+      await uploadBytes(imageRef, file);     
+
+      const imageUrl = await getDownloadURL(imageRef);
+
+      return imageUrl; 
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      return ""; 
+    }
+    
+    }
+
+  const extensions = [
+    ImageExtension(savePastedImage),
+    Placeholder.configure({
     placeholder: ({ node }) => {
       if (node.type.name === "text") {
         return `Heading ${node.attrs.level}`;
@@ -24,6 +47,7 @@ export default function CreateBlog() {
     },
     includeChildren: true,
   })];
+
 
   async function handlePreview() {
     navigate('/blog/preview/' , {
