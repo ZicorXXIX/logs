@@ -26,6 +26,7 @@ model Blog {
   id        String   @id @default(cuid())
   title     String
   content   String?
+  image     String?
   published DateTime @default(now())
   author    User     @relation(fields: [authorId], references: [id])
   authorId  String

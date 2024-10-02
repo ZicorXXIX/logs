@@ -1,11 +1,13 @@
 import BlogCard from "../components/BlogCard";
 import Navbar from "../components/Navbar";
 import Tabs from "../components/Tabs";
-import {useState} from 'react';
+import React, {useState} from 'react';
 import {useBlogs} from '../hooks/index';
 import { Link } from "react-router-dom";
 
-export default  function Blogs()  {
+
+
+function Blogs()  {
    const {loading, blogs} = useBlogs();
    console.log(blogs)
    const [activeTab, setActiveTab] = useState('for-you');
@@ -33,6 +35,7 @@ export default  function Blogs()  {
                      author={blog.author} 
                      published={blog.published} 
                      authorId={blog.authorId}
+                     image={blog.image}
                      id={blog.id}
                   />
                   </Link>
@@ -80,3 +83,7 @@ function Skeleton() {
     <hr className="h-px my-8 bg-gray-300 border-0"></hr>
    </>
 }
+
+
+
+export default React.memo(Blogs);

@@ -7,7 +7,6 @@ import {
   setCookie,
 } from 'hono/cookie'
 
-const EXPIRE_TIME = Math.floor(Date.now() / 1000) + 60 * 60 * 2;
 
 export const userRouter = new Hono<{
     Bindings: {
@@ -37,7 +36,7 @@ userRouter.get('/isAuth', async (c) =>{
     return c.json({decoded})
   } catch (error) {
       c.status(403)
-      return c.json({error: "Unauthorized access"})   
+      return c.json({error: error})   
   }
 })
 
@@ -66,7 +65,7 @@ userRouter.post('/signup', async (c) => {
         }
       })
       ///Math.floor(Date.now() / 1000) + 60 * 60 * 2 expires in 2hrs 
-      const token = await sign({ id : newUser.id, name: newUser.name,  exp: EXPIRE_TIME} , c.env.JWT_SECRET ) 
+      const token = await sign({ id : newUser.id, name: newUser.name,  exp: Math.floor(Date.now() / 1000) + 60 * 60 * 8} , c.env.JWT_SECRET ) 
       setCookie(c, 'jwt', token)
       return c.json({ jwt :token})
   
@@ -100,13 +99,13 @@ userRouter.post('/login', async (c) => {
         error:[ {message: "User not found or incorrect password"}]
         })
     }
-    const jwt = await sign({id: user.id, name: user.name, exp: EXPIRE_TIME}, c.env.JWT_SECRET);
+    const jwt = await sign({id: user.id, name: user.name, exp: Math.floor(Date.now() / 1000) + 60 * 60 * 8}, c.env.JWT_SECRET);
     setCookie(c, 'jwt', jwt)
     return c.json({jwt})
 })
 
 
-userRouter.get('/:id', async (c) => {
+userRouter.get('/details/:id', async (c) => {
   const id = c.req.param('id')
   const prisma = c.get('prisma')
   try {

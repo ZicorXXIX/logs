@@ -26,18 +26,7 @@ export default function CreateBlog() {
     includeChildren: true,
   })];
 
-  async function handlePublish() {
-  //   const response =await axios.post(`${BACKEND_URL}/api/v1/blog`, {
-  //     title,
-  //     content: data
-  //   },
-  //   {
-  //     headers: {
-  //       Authorization: `Bearer ${localStorage.getItem("jwt")}`
-  //     }
-  //   }
-  // );
-    // console.log(response);
+  async function handlePreview() {
     navigate('/blog/preview/' , {
       state: {
         title,
@@ -48,7 +37,7 @@ export default function CreateBlog() {
   return (
 
     <>
-            <Navbar publish={true} handlePublish={handlePublish} />
+            <Navbar publish={true} handlePublish={handlePreview} />
             <div className=" px-[5%] md:px-[20%] mt-10 bg-custom-white">
             <textarea              
               value={title}

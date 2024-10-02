@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { BACKEND_URL } from "../config";
 import axios from "axios";
-import jwt from 'jsonwebtoken';
+
 
 
 interface Blog {
@@ -13,6 +13,7 @@ interface Blog {
     published: Date;
     authorId: string;
     id: string;
+    image: string;
  }
 
 export const useBlog = (id: string) => {
