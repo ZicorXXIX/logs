@@ -9,7 +9,7 @@ export default function BlogContent() {
     // const publishedDate = formatDate(blog?.published || new Date());
     if(loading) return <Skeleton />
 
-    const published = blog?.published.toString()
+    // const published = blog?.published.toString()
     return <>        
         <h1 className="text-3xl text-black font-thin font-serif">{blog?.title}</h1>
         <div className="flex items-center mt-6">
@@ -18,7 +18,7 @@ export default function BlogContent() {
                 <span className="text-sm text-black font-medium">{blog?.author.name}</span>
                 <span className="text-sm text-black font-medium"> · </span>
                 <Link to="#" className="text-sm text-light-red font-medium">Follow</Link>
-                <p className="text-sm text-black/70 font-normal">4 min read · {blog?.published ? published   : ''}</p>
+                <p className="text-sm text-black/70 font-normal">4 min read · </p>
             </div>
         </div>
         <hr className="h-px my-8 bg-gray-300 border-0"></hr>   
