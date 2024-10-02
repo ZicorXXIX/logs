@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { loadEnv } from 'vite';
+import vercel from 'vite-plugin-vercel';
 
 // https://vitejs.dev/config/
 export default defineConfig(({   
@@ -9,6 +10,6 @@ export default defineConfig(({  
   process.env = loadEnv(mode, process.cwd());
 
   return {
-    plugins: [react()],
+    plugins: [react(), vercel()],
   };
 });
