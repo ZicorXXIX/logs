@@ -16,7 +16,7 @@ export default function BlogContent() {
                 <span className="text-sm text-black font-medium">{blog?.author.name}</span>
                 <span className="text-sm text-black font-medium"> · </span>
                 <Link to="#" className="text-sm text-light-red font-medium">Follow</Link>
-                <p className="text-sm text-black/70 font-normal">4 min read · {blog?.published ? blog.published.toDateString() : ''}</p>
+                <p className="text-sm text-black/70 font-normal">4 min read · {blog?.published ? blog.published.toLocaleDateString()   : ''}</p>
             </div>
         </div>
         <hr className="h-px my-8 bg-gray-300 border-0"></hr>   
