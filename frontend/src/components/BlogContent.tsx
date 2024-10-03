@@ -13,7 +13,7 @@ export default function BlogContent() {
     return <>        
         <h1 className="text-3xl text-black font-thin font-serif">{blog?.title}</h1>
         <div className="flex items-center mt-6">
-            <Avatar name="John Doe" size={10} />
+            <Avatar name="John Doe" size="large" />
             <div className="pl-4">
                 <span className="text-sm text-black font-medium">{blog?.author.name}</span>
                 <span className="text-sm text-black font-medium"> · </span>

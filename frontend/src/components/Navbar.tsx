@@ -31,7 +31,7 @@ export default function Navbar({publish , handlePublish }: {publish?: boolean, h
                 :
                 <>
                     <div onClick={()=> setIsVisible(!isVisible)} className='cursor-pointer'>
-                        <Avatar name={user} size={10} />
+                        <Avatar name={user} size="large" />
                     </div>
                     <Dropdown user={user} isVisible={isVisible} />
                 </>

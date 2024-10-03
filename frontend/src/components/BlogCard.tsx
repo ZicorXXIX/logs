@@ -21,7 +21,7 @@ export default function BlogCard({title, content, author, published, image}: Blo
     <div className="flex justify-between px-7">
         <section>
             <div className="flex items-center whitespace-nowrap">
-                <Avatar name={author.name || "Anonymous"} size={6} />
+                <Avatar name={author.name || "Anonymous"} size="small" />
                 <div className="ml-2">
                     <h2 className="text-sm font-medium">{author.name || "Anonymous"} •</h2>
                 </div>
