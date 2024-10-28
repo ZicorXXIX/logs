@@ -5,10 +5,12 @@ import { ChangeEvent, useState } from "react";
 import { SignupSchema, SigninSchema } from "@zicor/medium-common";
 import axios from "axios";
 import { BACKEND_URL } from "../config.ts";
+import { Turnstile } from '@marsidev/react-turnstile'
 
 export default function Auth({type}: {type: "login" | "signup"}) {
     const navigate = useNavigate();
     const [error, setError] = useState<string>("");
+    const [token, setToken] = useState<string>("");
     const [postInputs, setPostInputs] = useState< SigninSchema | SignupSchema>({
         email: "",
         password: "",
@@ -24,7 +26,7 @@ export default function Auth({type}: {type: "login" | "signup"}) {
     const sendRequest = async () => {
         try {
             setLoading(true)
-            const response = await axios.post(`${BACKEND_URL}/api/v1/user/${type}`, postInputs);
+            const response = await axios.post(`${BACKEND_URL}/api/v1/user/${type}`, {postInputs, token});
             localStorage.setItem("jwt", response.data.jwt);
             setLoading(false)
             navigate("/blogs");
@@ -65,6 +67,11 @@ export default function Auth({type}: {type: "login" | "signup"}) {
                         <a className="text-sm text-peach hover:text-light-red font-medium" href="#">Forgot your password?</a>
                     </div>
                      </div>}
+                     
+                    <div className="flex justify-center">
+                     <Turnstile onSuccess={(token)=> setToken(token)} siteKey='0x4AAAAAAAymAs-k8qNNG9Bo' />
+                    </div>
+
                      {type === "signup" ?
                         <Button color="peach" handleClick={sendRequest} type="button" >Sign up</Button>
                         : 

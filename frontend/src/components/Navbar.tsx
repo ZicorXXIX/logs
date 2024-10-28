@@ -1,13 +1,16 @@
 import Logo from '../assets/logo.png';
 import { Button } from '../ui/Button';
-import { useAuth } from '../hooks/index';
 import Avatar from '../ui/Avatar';
 import { useState } from 'react';
 import Dropdown from './Dropdown';
 import { Link } from 'react-router-dom';
+import { useRecoilValue } from 'recoil';
+import { userAtom } from '../store/atoms/user';
+
 export default function Navbar({publish , handlePublish }: {publish?: boolean, handlePublish?: ()=>Promise<void>}) {
-    const { user } = useAuth();
+    const user = useRecoilValue(userAtom)
     const [isVisible, setIsVisible] = useState(false)
+    console.log(user)
   
     return <>
         <div className="flex justify-between px-10 py-4 border-b border-black/20">
@@ -27,7 +30,7 @@ export default function Navbar({publish , handlePublish }: {publish?: boolean, h
                     </div>
                 </Link>
                 }
-                {!user ? <Button color="peach" type="button" size='small'>Sign Up</Button> 
+                {user === undefined ? <Button color="peach" type="button" size='small'>Sign Up</Button> 
                 :
                 <>
                     <div onClick={()=> setIsVisible(!isVisible)} className='cursor-pointer'>

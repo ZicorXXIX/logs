@@ -11,7 +11,8 @@ import {
 export const userRouter = new Hono<{
     Bindings: {
         DATABASE_URL : string,
-        JWT_SECRET : string
+        JWT_SECRET : string,
+        CLOUDFLARE_TURNSTILE_SECRET : string
     },
     Variables: {
         prisma : any
@@ -44,64 +45,113 @@ userRouter.post('/signup', async (c) => {
 
     const prisma = c.get("prisma")
   
-    const body = await c.req.json();
-    
-    const { success, data, error } = signupSchema.safeParse(body);
-    console.log(success, data, error);
-    
-    if(!success){
+    let body = await c.req.json();
+
+    const token = body.token;
+    let formData = new FormData();
+    formData.append("secret", c.env.CLOUDFLARE_TURNSTILE_SECRET);
+    formData.append("response", token);
+
+    const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      body: formData,
+    });
+  
+    const res = await response.json();
+
+    if (!res.success) {
+      // console.error('Turnstile validation failed:', data.error_codes);
+      // Handle the error appropriately
       c.status(403)
-      return c.json({
-        error: error.issues
-      })
-    }
-  
-    try {
-      const newUser = await prisma.user.create({
-        data: {
-          email : body.email,
-          name : body.name,
-          password : body.password
-        }
-      })
-      ///Math.floor(Date.now() / 1000) + 60 * 60 * 2 expires in 2hrs 
-      const token = await sign({ id : newUser.id, name: newUser.name,  exp: Math.floor(Date.now() / 1000) + 60 * 60 * 8} , c.env.JWT_SECRET ) 
-      setCookie(c, 'jwt', token)
-      return c.json({ jwt :token})
-  
-    } catch (e) {
-      c.status(403);
-      return c.json({
-        error: [{message: "Error Creating User....."}]
-      }) 
-    }  
-  })
-  
-userRouter.post('/login', async (c) => {
-    const prisma = c.get("prisma")
-    const body = await c.req.json();
-    const {success, error} = signinSchema.safeParse(body);
-    if(!success){
+        return c.json({
+        error:[ {message: "Invalid Captcha"}]
+        })
+    } else {
+      body = body.postInputs;
+      const { success, data, error } = signupSchema.safeParse(body);
+      console.log(success, data, error);
+      
+      if(!success){
         c.status(403)
         return c.json({
           error: error.issues
         })
-    }
-    const user = await prisma.user.findUnique({
-            where: {
-                email: body.email,
-                password: body.password
-            }
-        });
-    if(!user){
-        c.status(403)
-        return c.json({
-        error:[ {message: "User not found or incorrect password"}]
+      }
+    
+      try {
+        const newUser = await prisma.user.create({
+          data: {
+            email : body.email,
+            name : body.name,
+            password : body.password
+          }
         })
+        ///Math.floor(Date.now() / 1000) + 60 * 60 * 2 expires in 2hrs 
+        const token = await sign({ id : newUser.id, name: newUser.name,  exp: Math.floor(Date.now() / 1000) + 60 * 60 * 8} , c.env.JWT_SECRET ) 
+        setCookie(c, 'jwt', token)
+        return c.json({ jwt :token})
+    
+      } catch (e) {
+        c.status(403);
+        return c.json({
+          error: [{message: "Error Creating User....."}]
+        }) 
+      }  
     }
-    const jwt = await sign({id: user.id, name: user.name, exp: Math.floor(Date.now() / 1000) + 60 * 60 * 8}, c.env.JWT_SECRET);
-    setCookie(c, 'jwt', jwt)
-    return c.json({jwt})
+    
+  })
+  
+userRouter.post('/login', async (c) => {
+    const prisma = c.get("prisma")
+    let body = await c.req.json();
+
+    //CloudFlare Turnstile
+    const token = body.token;
+    let formData = new FormData();
+    formData.append("secret", c.env.CLOUDFLARE_TURNSTILE_SECRET);
+    formData.append("response", token);
+
+    const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      body: formData,
+    });
+  
+    const data = await response.json();
+  
+    if (!data.success) {
+      // console.error('Turnstile validation failed:', data.error_codes);
+      // Handle the error appropriately
+      c.status(403)
+        return c.json({
+        error:[ {message: "Invalid Captcha"}]
+        })
+    } else {
+      console.log('Turnstile validation successful');
+      // Proceed with your application logic
+      const {success, error} = signinSchema.safeParse(body.postInputs);
+      body = body.postInputs;
+      if(!success){
+          c.status(403)
+          return c.json({
+            error: error.issues
+          })
+      }
+      const user = await prisma.user.findUnique({
+              where: {
+                  email: body.email,
+                  password: body.password
+              }
+          });
+      if(!user){
+          c.status(403)
+          return c.json({
+          error:[ {message: "User not found or incorrect password"}]
+          })
+      }
+      const jwt = await sign({id: user.id, name: user.name, exp: Math.floor(Date.now() / 1000) + 60 * 60 * 8}, c.env.JWT_SECRET);
+      setCookie(c, 'jwt', jwt)
+      return c.json({jwt})
+    }
 })
 
 

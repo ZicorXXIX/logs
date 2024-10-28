@@ -7,12 +7,18 @@ import { useNavigate } from "react-router-dom";
 import { initializeApp } from "firebase/app";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import ImageExtension from '../components/ImageExtension.tsx';
+import { useRecoilValue } from "recoil";
+import { userAtom } from "../store/atoms/user.tsx";
+import Auth from "../components/Auth.tsx";
 
 
 export default function CreateBlog() {
   const [data, setData] = useState("Tell your story here...");
   const [title, setTitle] = useState("");
   const navigate = useNavigate();
+
+  const user = useRecoilValue(userAtom);
+
 
   const storage = getStorage(initializeApp(firebaseConfig));
 
@@ -57,10 +63,16 @@ export default function CreateBlog() {
       },
     });
   }
+  
   return (
 
     <>
             <Navbar publish={true} handlePublish={handlePreview} />
+            {user === undefined && <>
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <Auth type="login" />
+              </div>
+            </>}
             <div className=" px-[5%] md:px-[20%] mt-10 bg-custom-white">
             <textarea              
               value={title}

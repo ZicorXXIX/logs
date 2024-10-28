@@ -7,12 +7,14 @@ import CreateBlog from './pages/CreateBlog'
 import Blog from './pages/Blog'
 import PreviewBlog from './pages/PreviewBlog'
 import Landing from './pages/Landing'
+import { RecoilRoot } from 'recoil'
+
 
 function App() {
 
-
   return (
     <>
+    <RecoilRoot>
       <BrowserRouter>
         <Routes>
           <Route path='/signup' element={<Signup />} />
@@ -24,6 +26,7 @@ function App() {
           <Route path='/create' element={<CreateBlog />} />
         </Routes>
       </BrowserRouter>
+    </RecoilRoot>
     </>
   )
 }
